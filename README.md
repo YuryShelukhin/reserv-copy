@@ -15,14 +15,17 @@
 
 
 # Решение 1.
-1. Создадим два файла index.html в директориях http1 и http2. Укажем в них номера разные портов.      
-<img src = "img/1-1.png" width = 60%>    
-<img src = "img/1-2.png" width = 60%>   
-запустим два simple python сервера    
-python3 -m http.server 8888 --bind 0.0.0.0  и python3 -m http.server 9999 --bind 0.0.0.0  
-<img src = "img/1-3.png" width = 60%>   
-проверим  
-<img src = "img/1-4.png" width = 60%>
+1. Cоздадим зеркальную копию домашней директории пользователя в директорию `/tmp/backup`.  
+rsync -a --progress ~ /tmp/backup  
+<img src = "img/1-1.png" width = 60%>
+
+2. Исключим из синхронизации все директории, начинающиеся с точки (скрытые).  
+rsync -a --exclude='.*/' ~ /tmp/backup
+<img src = "img/1-2.png" width = 60%>  
+
+3. Cделаем так, чтобы rsync подсчитывал хэш-суммы для всех файлов, даже если их время модификации и размер идентичны в источнике и приемнике.  
+rsync -ac --progress --exclude='.*/' ~ /tmp/backup
+<img src = "img/1-3.png" width = 60%>
 
 ---
 
