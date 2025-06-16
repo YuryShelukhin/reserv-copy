@@ -16,15 +16,15 @@
 
 # Решение 1.
 1. Cоздадим зеркальную копию домашней директории пользователя в директорию `/tmp/backup`.  
-rsync -a --progress ~ /tmp/backup  
+`rsync -a --progress ~ /tmp/backup`  
 <img src = "img/1-1.png" width = 60%>
 
 2. Исключим из синхронизации все директории, начинающиеся с точки (скрытые).  
-rsync -a --exclude='.*/' ~ /tmp/backup
+`rsync -a --exclude='.*/' ~ /tmp/backup`
 <img src = "img/1-2.png" width = 60%>  
 
 3. Cделаем так, чтобы rsync подсчитывал хэш-суммы для всех файлов, даже если их время модификации и размер идентичны в источнике и приемнике.  
-rsync -ac --progress --exclude='.*/' ~ /tmp/backup
+`rsync -ac --progress --exclude='.*/' ~ /tmp/backup`
 <img src = "img/1-3.png" width = 60%>
 
 ---
@@ -37,6 +37,44 @@ rsync -ac --progress --exclude='.*/' ~ /tmp/backup
 - На проверку направить файл crontab и скриншот с результатом работы утилиты.
 
 ---
+
+# Решение 2.
+1. Добавим задачу в cron.  
+` sudo crontab -e`  
+<img src = "img/2-1.png" width = 60%>  
+
+2. Напишем скрипт.
+```
+#!/bin/bash
+
+# команда rsync. Cтандартный вывод - в /dev/null, ошибки - в лог
+rsync -ac --delete /home/yury /tmp/backup > /dev/null 2>> /var/log/backup.log
+
+# проверка кода завершения rsync и запись лога
+if [ $? -eq 0 ]; then
+    echo "[$(date)] - резервное копирование успешно выполнено" >> /var/log/backup.log
+else
+    echo "[$(date)] - ошибка при выполнении резервного копирования" >> /var/log/backup.log
+fi
+```
+Сделаем скрипт исполняемым.
+`chmod +x /home/yury/HW/Fail-safety/Reserv-copy/files/backup1.sh`
+3. Проверим создание копии.
+<img src = "img/2-2.png" width = 60%>
+
+4.  Проверим лог
+<img src = "img/2-3.png" width = 60%>  
+
+### Использован следующий скрипт.  
+[скрипт](files/backup1.sh)  
+
+
+
+1. Cделаем так, чтобы rsync подсчитывал хэш-суммы для всех файлов, даже если их время модификации и размер идентичны в источнике и приемнике.  
+rsync -ac --progress --exclude='.*/' ~ /tmp/backup
+<img src = "img/1-3.png" width = 60%>
+
+
 
 ## Задания со звёздочкой*
 Эти задания дополнительные. Их можно не выполнять. На зачёт это не повлияет. Вы можете их выполнить, если хотите глубже разобраться в материале.
