@@ -1,11 +1,12 @@
 #!/bin/bash
 
 # исходная директория
-SOURCE_DIR="/home/yury"
+#SOURCE_DIR="/home/yury"
 # целевая директория
-TARGET_DIR="/tmp/backup"
+#TARGET_DIR="/tmp/backup"
 # команда rsync. Cтандартный вывод - в /dev/null, ошибки - в лог
 #rsync -ac --delete "$SOURCE_DIR" "$TARGET_DIR" > /dev/null 2>> /var/log/backup.log
+
 rsync -ac --delete /home/yury /tmp/backup > /dev/null 2>> /var/log/backup.log
 
 # проверка кода завершения rsync и запись лога
