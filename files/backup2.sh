@@ -1,20 +1,19 @@
 #!/bin/bash
 
 # Параметры скрипта
-SOURCE_DIR="/test"
-REMOTE_HOST="root@192.168.100.10"
-REMOTE_DIR="/backup_server1"
+SOURCE_DIR="/home/yury"
+REMOTE_HOST="yury@192.168.65.136"
+REMOTE_DIR="/home/yury/HW/backup_server"
 BACKUP_PREFIX="backup"
 MAX_BACKUPS=5
 
-# Проверяем создана ли директория в которую будут записаны бэкапы
+# Проверяем создана ли директория на удаленном сервере в которую будут записаны бэкапы, если нет, то создаем
 ssh "$REMOTE_HOST" "test -d $REMOTE_DIR/ || mkdir -p $REMOTE_DIR "
 
 # Функция для создания инкрементного бэкапа.
 # В rsync указываем в качестве референсной директории - предыдущий бэкап на удаленном сервере.
-# Создаём очередной бэкап c датой и временем в имени, в дальнейшем получить имя самого нового или 
-# самого старого бэкапа можно просто выполнив ls [-r] | grep backup | tail -1
-# Проверяем были ли созданы бэкапы до этого. Если папка пустая, то создаём первый (без опции -link-dest)
+# Создаём очередной бэкап c датой и временем в имени, Проверяем были ли созданы бэкапы до этого.
+# Если папка пустая, то создаём первый (без опции -link-dest)
 create_backup() {
   new_backup_name="${BACKUP_PREFIX}_$(date +%Y-%m-%d_%H:%M:%S)"
   if ssh "$REMOTE_HOST" "ls -d $REMOTE_DIR/${BACKUP_PREFIX}*" >/dev/null 2>&1 ; then 
@@ -66,6 +65,6 @@ elif [[ "$1" == "-list" ]]; then
         exit 0
     fi
 else
-    echo "Неправильная команда. Доступны команды: incr-backup.sh -list|-run"
+    echo "Неправильная команда. Доступны команды: backup2.sh -list|-run"
     exit 1
 fi
