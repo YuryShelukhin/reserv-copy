@@ -17,11 +17,13 @@
 # Решение 1.
 1. Cоздадим зеркальную копию домашней директории пользователя в директорию /tmp/backup.  
 `rsync -a --progress ~ /tmp/backup`  
-<img src = "img/1-1.png" width = 60%>
-2. Исключим из синхронизации все директории, начинающиеся с точки (скрытые).  
+<img src = "img/1-1.png" width = 60%>  
+
+2. Исключим из синхронизации все директории, начинающиеся с точки (скрытые).    
 `rsync -a --exclude='.*/' ~ /tmp/backup`
-<img src = "img/1-2.png" width = 60%>  
-3. Cделаем так, чтобы rsync подсчитывал хэш-суммы для всех файлов, даже если их время модификации и размер идентичны в источнике и приемнике.  
+<img src = "img/1-2.png" width = 60%>   
+
+3. Cделаем так, чтобы rsync подсчитывал хэш-суммы для всех файлов, даже если их время модификации и размер идентичны в источнике и приемнике.    
 `rsync -ac --progress --exclude='.*/' ~ /tmp/backup`
 <img src = "img/1-3.png" width = 60%>
 
@@ -77,10 +79,11 @@ fi
 # Решение 3*.
 1. Создадим файл 20 Мб.    
 `dd if=/dev/random of=/home/yury/HW/Fail-safety/Reserv-copy/files/large_file bs=2M count=10`    
-<img src = "img/3-1.png" width = 60%> 
-2. Запустим команду rsync с ограничениями.
-`rsync -avP --bwlimit=1000 --checksum /home/yury/HW/Fail-safety/Reserv-copy/files/large_file yury@192.168.65.136:/home/yury/HW/large_file`  
-<img src = "img/3-2.png" width = 60%>  
+<img src = "img/3-1.png" width = 60%>  
+
+2. Запустим команду rsync с ограничениями.    
+`rsync -avP --bwlimit=1000 --checksum /home/yury/HW/Fail-safety/Reserv-copy/files/large_file yury@192.168.65.136:/home/yury/HW/large_file`   
+<img src = "img/3-2.png" width = 60%>    
 <img src = "img/3-2.png" width = 60%>
 
 ---
@@ -95,45 +98,21 @@ fi
 
 # Решение 4*.
 1. Скрипт запускается с параметрами -run (производится бэкап) или -list (выводится список бэкапов и таким образом выберите нужный для восстановления). Пакеты для хранения на удаленном расстоянии. Каждый следующий бэкап-линкуется с альтернативным бэкапом (опция --link-dest, определите жесткую ссылку), таким образом экономится место на диске удалённого сервера, дублируясь между бэкапами файлов, которые являются жесткими ссылками, и при удалении файлов бэкапа все пересекающиеся файлы остаются доступными в других бэкапах.
-2. Проверим работу скрипта, запустив его несколько раз.  
-`bash -x backup2.sh -run`
+2. Проверим работу скрипта, запустив его несколько раз.    
+`bash -x backup2.sh -run`    
 <img src = "img/4-1.png" width = 60%>  
 <img src = "img/4-2.png" width = 60%>
+<img src = "img/4-3.png" width = 60%>
+<img src = "img/4-4.png" width = 60%>  
 
-1. Напишем скрипт.
-```
-#!/bin/bash
-
-# команда rsync. Cтандартный вывод - в /dev/null, ошибки - в лог
-rsync -ac --delete /home/yury /tmp/backup > /dev/null 2>> /var/log/backup.log
-
-# проверка кода завершения rsync и запись лога
-if [ $? -eq 0 ]; then
-    echo "[$(date)] - резервное копирование успешно выполнено" >> /var/log/backup.log
-else
-    echo "[$(date)] - ошибка при выполнении резервного копирования" >> /var/log/backup.log
-fi
-```
-Сделаем скрипт исполняемым.  
-`chmod +x /home/yury/HW/Fail-safety/Reserv-copy/files/backup1.sh`  
-3. Проверим создание копии.  
-<img src = "img/2-2.png" width = 60%>  
-4. Проверим лог  
-<img src = "img/2-3.png" width = 60%>  
+3. Проверим возможность восстановления. Введем заведомо некорректный номер для проверки работы.  
+`bash backup2.sh -list`  
+<img src = "img/4-5.png" width = 60%>  
 
 ### Использован следующий скрипт.  
-[скрипт](files/backup1.sh)  
+[скрипт](files/backup2.sh)  
 
 ---
 
-
-
-### Использованы следующие файлы конфигурации.  
-[конфигурация nginx](files/nginx.conf)  
-[доп. конфигурационный файл nginx](files/example-http.conf)  
-[конфигурация HAProxy](files/haproxy.cfg)  
-[конфигурация upstream](files/upstream.inc)
-
----
 
 
